@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  ketch-event-forwarder:
+    build:
+      context: .
+      dockerfile: docker/ketch-event-forwarder/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./.certs:/tls
+    environment:
+      KETCH_EVENT_FORWARDER_SERVER_LISTEN: 5000
+      KETCH_EVENT_FORWARDER_SERVER_TLS_CERT_FILE: /tls/server.crt
+      KETCH_EVENT_FORWARDER_SERVER_TLS_KEY_FILE: /tls/server.key
+
+networks:
+  default:
+    name: ketch_forwarder_default

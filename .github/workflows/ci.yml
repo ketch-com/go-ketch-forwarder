@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      version-major: ${{ steps.version.outputs.version-major-only }}
+      version-minor: ${{ format('{0}.{1}', steps.version.outputs.version-major-only, steps.version.outputs.version-minor-only) }}
+      version-patch: ${{ format('{0}.{1}.{2}', steps.version.outputs.version-major-only, steps.version.outputs.version-minor-only, steps.version.outputs.version-patch-only) }}
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Generate next version
+      id: version
+      uses: conventional-actions/next-version@v1
+    - name: Setup .netrc
+      uses: conventional-actions/setup-netrc@v1
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: "1.18"
+        cache: true
+    - name: Extract Go module metadata
+      uses: conventional-actions/go-metadata@v1
+      id: metadata
+    - name: Setup Go version
+      uses: conventional-actions/go-version@v1
+      with:
+        version: ${{ steps.version.outputs.version }}
+        package: ${{ steps.metadata.outputs.module }}/version
+        variable: Version
+    - name: Build Go code
+      uses: conventional-actions/go-build@v1
+      with:
+        package: ./cmd/ketch-event-forwarder
+        platforms: linux/amd64,linux/arm64
+    - uses: actions/upload-artifact@v3
+      with:
+        name: docker
+        path: docker
+
+  package-ketch-event-forwarder:
+    name: Package ketch-event-forwarder
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Download docker artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: docker
+        path: docker
+    - name: Download ketch-event-forwarder amd64 binary
+      uses: actions/download-artifact@v3
+      with:
+        name: ketch-event-forwarder_linux_amd64
+        path: .build/linux-amd64
+    - name: Download ketch-event-forwarder arm64 docker
+      uses: actions/download-artifact@v3
+      with:
+        name: ketch-event-forwarder_linux_arm64
+        path: .build/linux-arm64
+    - name: Set up QEMU
+      id: qemu
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: linux/amd64,linux/arm64
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        buildkitd-flags: '--allow-insecure-entitlement network.host'
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Metadata for ketch-event-forwarder
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ghcr.io/${{ github.repository_owner }}/go-ketch-forwarder
+        tags: |
+          type=raw,value=latest
+          type=raw,value=${{ needs.build.outputs.version-major }}
+          type=raw,value=${{ needs.build.outputs.version-minor }}
+          type=raw,value=${{ needs.build.outputs.version-patch }}
+    - name: Push ketch-event-forwarder container
+      if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: docker/ketch-event-forwarder/Dockerfile
+        push: true
+        load: false
+        allow: network.host
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64,linux/arm64
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+  release:
+    name: Release
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    needs:
+    - build
+    - package-ketch-event-forwarder
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Create Release
+      uses: conventional-actions/create-release@v1
+      with:
+        tag_name: ${{ needs.build.outputs.version }}
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
