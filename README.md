@@ -11,6 +11,11 @@ git clone git@github.com:ketch-com/go-ketch-forwarder.git
 cd go-ketch-forwarder
 ```
 
+## Environment variables
+This application uses environment variables to determine the port to bind and the https certificates to use.  
+Environment variables can either be exported from .envrc or you can use https://direnv.net/ to automatically 
+load the environment variables.
+
 ## Building
 
 To build the code, use the following:

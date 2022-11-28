@@ -10,9 +10,9 @@ services:
     volumes:
       - ./.certs:/tls
     environment:
-      KETCH_EVENT_FORWARDER_SERVER_LISTEN: 5000
-      KETCH_EVENT_FORWARDER_SERVER_TLS_CERT_FILE: /tls/server.crt
-      KETCH_EVENT_FORWARDER_SERVER_TLS_KEY_FILE: /tls/server.key
+      KETCH_LISTEN: 5000
+      KETCH_TLS_CERT_FILE: /tls/server.crt
+      KETCH_TLS_KEY_FILE: /tls/server.key
 
 networks:
   default:
