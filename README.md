@@ -50,7 +50,7 @@ docker build -f docker/ketch-event-forwarder/Dockerfile --tag ketch-event-forwar
 Now, you can run the container:
 
 ```shell
-docker run -d -p 5000:5000 -v $PWD/certs:/tls -e KETCH_USER_NAME=user1 -e KETCH_USER_PASSWORD=password1 ketch-event-forwarder:latest
+docker run -d -p 5000:5000 -v $PWD/.certs:/tls -e KETCH_USER_NAME=user1 -e KETCH_USER_PASSWORD=password1 ketch-event-forwarder:latest
 ```
 
 You will now have a running event forwarder listening on port 5000.
