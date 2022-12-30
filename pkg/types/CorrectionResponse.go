@@ -11,7 +11,8 @@ type CorrectionResponseBody struct {
 	ExpectedCompletionTimestamp int64               `json:"expectedCompletionTimestamp"`
 	RedirectURL                 string              `json:"redirectUrl,omitempty"`
 	RequestID                   string              `json:"requestID,omitempty"`
-	Documents                   any                 `json:"documents,omitempty"`
+	Documents                   []*Callback         `json:"documents,omitempty"`
+	DocumentData                any                 `json:"documentData,omitempty"`
 	Claims                      map[string]any      `json:"claims,omitempty"`
 	Subject                     *DataSubject        `json:"subject,omitempty"`
 	Identities                  []*Identity         `json:"identities,omitempty"`

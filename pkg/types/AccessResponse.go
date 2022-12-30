@@ -11,8 +11,10 @@ type AccessResponseBody struct {
 	ExpectedCompletionTimestamp int64               `json:"expectedCompletionTimestamp,omitempty"`
 	RedirectURL                 string              `json:"redirectUrl,omitempty"`
 	RequestID                   string              `json:"requestID,omitempty"`
-	Results                     any                 `json:"results,omitempty"`
-	Documents                   any                 `json:"documents,omitempty"`
+	Results                     []*Callback         `json:"results,omitempty"`
+	Documents                   []*Callback         `json:"documents,omitempty"`
+	ResultData                  any                 `json:"resultData,omitempty"`
+	DocumentData                any                 `json:"documentData,omitempty"`
 	Claims                      map[string]any      `json:"claims,omitempty"`
 	Subject                     *DataSubject        `json:"subject,omitempty"`
 	Identities                  []*Identity         `json:"identities,omitempty"`
