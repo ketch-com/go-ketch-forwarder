@@ -8,9 +8,15 @@ import (
 type RestrictProcessingResponseBody struct {
 	Status                      RequestStatus       `json:"status,omitempty"`
 	Reason                      RequestStatusReason `json:"reason,omitempty"`
-	RequestID                   string              `json:"requestID,omitempty"`
 	ExpectedCompletionTimestamp int64               `json:"expectedCompletionTimestamp,omitempty"`
-	//RedirectURL                 string              `json:"redirectUrl,omitempty"`
+	RedirectURL                 string              `json:"redirectUrl,omitempty"`
+	RequestID                   string              `json:"requestID,omitempty"`
+	Documents                   []*Callback         `json:"documents,omitempty"`
+	DocumentData                any                 `json:"documentData,omitempty"`
+	Claims                      map[string]any      `json:"claims,omitempty"`
+	Subject                     *DataSubject        `json:"subject,omitempty"`
+	Identities                  []*Identity         `json:"identities,omitempty"`
+	Messages                    []*Message          `json:"messages,omitempty"`
 }
 
 func (r *RestrictProcessingResponseBody) ValidateWithContext(ctx context.Context) error {

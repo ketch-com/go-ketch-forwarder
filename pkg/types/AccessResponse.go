@@ -8,10 +8,17 @@ import (
 type AccessResponseBody struct {
 	Status                      RequestStatus       `json:"status,omitempty"`
 	Reason                      RequestStatusReason `json:"reason,omitempty"`
-	RequestID                   string              `json:"requestID,omitempty"`
 	ExpectedCompletionTimestamp int64               `json:"expectedCompletionTimestamp,omitempty"`
+	RedirectURL                 string              `json:"redirectUrl,omitempty"`
+	RequestID                   string              `json:"requestID,omitempty"`
 	Results                     []*Callback         `json:"results,omitempty"`
-	//RedirectURL                 string              `json:"redirectUrl,omitempty"`
+	Documents                   []*Callback         `json:"documents,omitempty"`
+	ResultData                  any                 `json:"resultData,omitempty"`
+	DocumentData                any                 `json:"documentData,omitempty"`
+	Claims                      map[string]any      `json:"claims,omitempty"`
+	Subject                     *DataSubject        `json:"subject,omitempty"`
+	Identities                  []*Identity         `json:"identities,omitempty"`
+	Messages                    []*Message          `json:"messages,omitempty"`
 }
 
 func (r *AccessResponseBody) ValidateWithContext(ctx context.Context) error {

@@ -39,6 +39,9 @@ var (
 		OutsideJurisdictionRequestStatusReason,
 		TooManyRequestsRequestStatusReason,
 		OtherRequestStatusReason,
+		Requested,
+		InsufficientIdentification,
+		Executed,
 	}
 )
 
@@ -76,6 +79,9 @@ type RequestStatusReason string
 const (
 	UnknownRequestStatusReason                  RequestStatusReason = "unknown"
 	SuspectedFraudRequestStatusReason           RequestStatusReason = "suspected_fraud"
+	Requested                                   RequestStatusReason = "requested"
+	InsufficientIdentification                  RequestStatusReason = "insufficient_identification"
+	Executed                                    RequestStatusReason = "executed"
 	InsufficientVerificationRequestStatusReason RequestStatusReason = "insufficient_verification"
 	NoMatchRequestStatusReason                  RequestStatusReason = "no_match"
 	ClaimNotCoveredRequestStatusReason          RequestStatusReason = "claim_not_covered"

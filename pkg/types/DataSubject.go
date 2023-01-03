@@ -7,6 +7,7 @@ import (
 )
 
 type DataSubject struct {
+	Type            string `json:"type,omitempty"`
 	Email           string `json:"email,omitempty"`
 	FirstName       string `json:"firstName,omitempty"`
 	LastName        string `json:"lastName,omitempty"`

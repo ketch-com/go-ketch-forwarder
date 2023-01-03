@@ -6,11 +6,17 @@ import (
 )
 
 type CorrectionResponseBody struct {
-	Status                      RequestStatus       `json:"status,omitempty"`
-	Reason                      RequestStatusReason `json:"reason,omitempty"`
+	Status                      RequestStatus       `json:"status"`
+	Reason                      RequestStatusReason `json:"reason"`
+	ExpectedCompletionTimestamp int64               `json:"expectedCompletionTimestamp"`
+	RedirectURL                 string              `json:"redirectUrl,omitempty"`
 	RequestID                   string              `json:"requestID,omitempty"`
-	ExpectedCompletionTimestamp int64               `json:"expectedCompletionTimestamp,omitempty"`
-	//RedirectURL                 string              `json:"redirectUrl,omitempty"`
+	Documents                   []*Callback         `json:"documents,omitempty"`
+	DocumentData                any                 `json:"documentData,omitempty"`
+	Claims                      map[string]any      `json:"claims,omitempty"`
+	Subject                     *DataSubject        `json:"subject,omitempty"`
+	Identities                  []*Identity         `json:"identities,omitempty"`
+	Messages                    []*Message          `json:"messages,omitempty"`
 }
 
 func (r *CorrectionResponseBody) ValidateWithContext(ctx context.Context) error {
