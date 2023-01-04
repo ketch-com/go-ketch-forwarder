@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/ketch-com/go-ketch-forwarder/pkg/client"
 	"github.com/ketch-com/go-ketch-forwarder/pkg/metadata"
 	"github.com/ketch-com/go-ketch-forwarder/pkg/types"
 	"go.uber.org/fx"
@@ -21,6 +22,7 @@ type HandlerParams struct {
 	Delete             types.DeleteHandler             `optional:"true"`
 	Correction         types.CorrectionHandler         `optional:"true"`
 	RestrictProcessing types.RestrictProcessingHandler `optional:"true"`
+	CallbackHandler    client.Handler                  `optional:"true"`
 }
 
 type kindHandler func(ctx context.Context, w http.ResponseWriter, request *types.Request)
@@ -58,8 +60,8 @@ func NewHandler(params HandlerParams) http.Handler {
 	} else {
 		log.Println("⚠️ Starting server without authentication. Not recommended for production use.")
 	}
-
 	mux.Post("/ketch/events", handler.ServeHTTP)
+	mux.Post("/callback/test", handler.params.CallbackHandler.ServeHTTP)
 	return mux
 }
 
