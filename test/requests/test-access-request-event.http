@@ -1,4 +1,4 @@
-POST https://localhost:5000/callback HTTP/1.1
+POST http://localhost:5000/callback/test HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer auth

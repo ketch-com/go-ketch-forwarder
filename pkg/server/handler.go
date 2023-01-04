@@ -61,7 +61,7 @@ func NewHandler(params HandlerParams) http.Handler {
 		log.Println("⚠️ Starting server without authentication. Not recommended for production use.")
 	}
 	mux.Post("/ketch/events", handler.ServeHTTP)
-	mux.Post("/callback", handler.params.CallbackHandler.ServeHTTP)
+	mux.Post("/callback/test", handler.params.CallbackHandler.ServeHTTP)
 	return mux
 }
 
