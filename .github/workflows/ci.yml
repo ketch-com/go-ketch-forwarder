@@ -60,17 +60,17 @@ jobs:
       packages: write
     steps:
     - name: Download docker artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: docker
         path: docker
     - name: Download ketch-event-forwarder amd64 binary
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: ketch-event-forwarder_linux_amd64
         path: .build/linux-amd64
     - name: Download ketch-event-forwarder arm64 docker
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: ketch-event-forwarder_linux_arm64
         path: .build/linux-arm64
