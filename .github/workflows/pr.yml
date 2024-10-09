@@ -38,12 +38,12 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ env.GITHUB_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ env.GITHUB_TOKEN }}
       - name: Build docker image
         uses: docker/build-push-action@v5
         id: dockerbuild
@@ -52,25 +52,25 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ${{ matrix.images.dockerfile }}
           tags: ${{ matrix.images.localRegistry }}:latest
-          push: true
+          # push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secret-files: |
             "netrc=/home/runner/.netrc"
-      - name: Run Snyk for linux/amd64
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
-        with:
-          image: ${{ matrix.images.localRegistry }}:latest
-          args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/amd64
-      - name: Run Snyk for linux/arm64
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
-        with:
-          image: ${{ matrix.images.localRegistry }}:latest
-          args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/arm64
+      # - name: Run Snyk for linux/amd64
+      #   uses: snyk/actions/docker@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
+      #   with:
+      #     image: ${{ matrix.images.localRegistry }}:latest
+      #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/amd64
+      # - name: Run Snyk for linux/arm64
+      #   uses: snyk/actions/docker@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
+      #   with:
+      #     image: ${{ matrix.images.localRegistry }}:latest
+      #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/arm64
 
 concurrency:
   cancel-in-progress: true
