@@ -2,132 +2,182 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build:
-    name: Build
+  draft-release:
+    name: Prepare next version
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+    permissions:
+      contents: write
     outputs:
-      version: ${{ steps.version.outputs.version }}
-      version-major: ${{ steps.version.outputs.version-major-only }}
-      version-minor: ${{ format('{0}.{1}', steps.version.outputs.version-major-only, steps.version.outputs.version-minor-only) }}
-      version-patch: ${{ format('{0}.{1}.{2}', steps.version.outputs.version-major-only, steps.version.outputs.version-minor-only, steps.version.outputs.version-patch-only) }}
-    permissions:
-      contents: read
+      version: ${{ steps.semver.outputs.version }}
+      version-major: ${{ steps.semver.outputs.version-major-only }}
+      version-minor: ${{ format('{0}.{1}', steps.semver.outputs.version-major-only, steps.semver.outputs.version-minor-only) }}
+      version-patch: ${{ format('{0}.{1}.{2}', steps.semver.outputs.version-major-only, steps.semver.outputs.version-minor-only, steps.semver.outputs.version-patch-only) }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Generate next version
-      id: version
-      uses: conventional-actions/next-version@v1
-    - name: Setup .netrc
-      uses: conventional-actions/setup-netrc@v1
-    - name: Setup Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: "1.18"
-        cache: true
-    - name: Extract Go module metadata
-      uses: conventional-actions/go-metadata@v1
-      id: metadata
-    - name: Setup Go version
-      uses: conventional-actions/go-version@v1
-      with:
-        version: ${{ steps.version.outputs.version }}
-        package: ${{ steps.metadata.outputs.module }}/version
-        variable: Version
-    - name: Build Go code
-      uses: conventional-actions/go-build@v1
-      with:
-        package: ./cmd/ketch-event-forwarder
-        platforms: linux/amd64,linux/arm64
-    - uses: actions/upload-artifact@v3
-      with:
-        name: docker
-        path: docker
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate next version
+        id: semver
+        uses: conventional-actions/next-version@v1
+      - name: Create Draft Release
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: true
+          draft: false
+          allowUpdates: true
+          commit: ${{ github.sha }}
+          tag: ${{ steps.semver.outputs.version }}
+          name: ${{ steps.semver.outputs.version }}
+          body: "*pending*"
+          token: ${{ env.GITHUB_TOKEN }}
 
-  package-ketch-event-forwarder:
-    name: Package ketch-event-forwarder
-    needs: build
+  build-push-go:
+    name: Build go
     runs-on: ubuntu-latest
+    needs:
+      - draft-release
+    strategy:
+      matrix:
+        images:
+          - githubRegistry: ghcr.io/ketch-com/ketch-event-forwarder
+            # ecrRepository: ketch-event-forwarder
+            localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
+            dockerfile: docker/ketch-event-forwarder/Dockerfile
+      fail-fast: false
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     permissions:
       contents: read
-      packages: write
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
-    - name: Download docker artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: docker
-        path: docker
-    - name: Download ketch-event-forwarder amd64 binary
-      uses: actions/download-artifact@v3
-      with:
-        name: ketch-event-forwarder_linux_amd64
-        path: .build/linux-amd64
-    - name: Download ketch-event-forwarder arm64 docker
-      uses: actions/download-artifact@v3
-      with:
-        name: ketch-event-forwarder_linux_arm64
-        path: .build/linux-arm64
-    - name: Set up QEMU
-      id: qemu
-      uses: docker/setup-qemu-action@v2
-      with:
-        platforms: linux/amd64,linux/arm64
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        buildkitd-flags: '--allow-insecure-entitlement network.host'
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Metadata for ketch-event-forwarder
-      id: meta
-      uses: docker/metadata-action@v4
-      with:
-        images: ghcr.io/${{ github.repository_owner }}/go-ketch-forwarder
-        tags: |
-          type=raw,value=latest
-          type=raw,value=${{ needs.build.outputs.version-major }}
-          type=raw,value=${{ needs.build.outputs.version-minor }}
-          type=raw,value=${{ needs.build.outputs.version-patch }}
-    - name: Push ketch-event-forwarder container
-      if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        file: docker/ketch-event-forwarder/Dockerfile
-        push: true
-        load: false
-        allow: network.host
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+      - uses: actions/checkout@v4
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+      #   with:
+      #     registries: "337034319268"
+      #     mask-password: "true"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Setup .netrc
+        uses: conventional-actions/setup-netrc@v1
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ matrix.images.githubRegistry }}
+            # ${{ steps.login-ecr.outputs.registry }}/${{ matrix.images.ecrRepository }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ needs.draft-release.outputs.version-major }}
+            type=raw,value=${{ needs.draft-release.outputs.version-minor }}
+            type=raw,value=${{ needs.draft-release.outputs.version-patch }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ env.GITHUB_TOKEN }}
+      - name: Build docker image
+        uses: docker/build-push-action@v5
+        id: dockerbuild
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          file: ${{ matrix.images.dockerfile }}
+          tags: ${{ matrix.images.localRegistry }}:latest
+          # push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secret-files: |
+            "netrc=/home/runner/.netrc"
+      # - name: Run Snyk for linux/amd64
+      #   uses: snyk/actions/docker@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
+      #   with:
+      #     image: ${{ matrix.images.localRegistry }}:latest
+      #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/amd64
+      # - name: Run Snyk for linux/arm64
+      #   uses: snyk/actions/docker@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
+      #   with:
+      #     image: ${{ matrix.images.localRegistry }}:latest
+      #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/arm64
+      - name: Push docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64,linux/amd64
+          file: ${{ matrix.images.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+          secret-files: |
+            "netrc=/home/runner/.netrc"
 
   release:
-    name: Release
-    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    name: Finalize release
     needs:
-    - build
-    - package-ketch-event-forwarder
+      - draft-release
+      - build-push-go
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     permissions:
       contents: write
     steps:
-    - name: Create Release
-      uses: conventional-actions/create-release@v1
-      with:
-        tag_name: ${{ needs.build.outputs.version }}
+      - name: Finalize release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          tag: ${{ needs.draft-release.outputs.version }}
+          name: ${{ needs.draft-release.outputs.version }}
+          token: ${{ env.GITHUB_TOKEN }}
+
+  # deploy:
+  #   name: Deploy to UAT
+  #   if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+  #   needs:
+  #     - draft-release
+  #     - release
+  #   uses: ketch-com/crew/.github/workflows/uat.yml@main
+  #   with:
+  #     version: ${{ needs.draft-release.outputs.version-patch }}
+  #     service: ketch-event-forwarder
+  #   secrets:
+  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  #     GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+  #     GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
 concurrency:
   cancel-in-progress: true

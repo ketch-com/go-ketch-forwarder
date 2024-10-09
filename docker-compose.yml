@@ -7,6 +7,8 @@ services:
       dockerfile: docker/ketch-event-forwarder/Dockerfile
     ports:
       - "5000:5000"
+    secrets:
+      - netrc
     volumes:
       - ./.certs:/tls
     environment:
@@ -17,3 +19,7 @@ services:
 networks:
   default:
     name: ketch_forwarder_default
+
+secrets:
+  netrc:
+    file: ~/.netrc
