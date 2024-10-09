@@ -35,7 +35,7 @@ jobs:
           tag: ${{ steps.semver.outputs.version }}
           name: ${{ steps.semver.outputs.version }}
           body: "*pending*"
-          token: ${{ env.GITHUB_TOKEN }}
+          # token: ${{ env.GITHUB_TOKEN }}
 
   build-push-go:
     name: Build go
@@ -45,9 +45,9 @@ jobs:
     strategy:
       matrix:
         images:
-          - githubRegistry: ghcr.io/ketch-com/ketch-event-forwarder
+          - localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
+            # githubRegistry: ghcr.io/ketch-com/ketch-event-forwarder
             # ecrRepository: ketch-event-forwarder
-            localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
             dockerfile: docker/ketch-event-forwarder/Dockerfile
       fail-fast: false
     env:
@@ -111,7 +111,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ${{ matrix.images.dockerfile }}
           tags: ${{ matrix.images.localRegistry }}:latest
-          # push: true
+          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secret-files: |
@@ -130,20 +130,20 @@ jobs:
       #   with:
       #     image: ${{ matrix.images.localRegistry }}:latest
       #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/arm64
-      - name: Push docker images
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/arm64,linux/amd64
-          file: ${{ matrix.images.dockerfile }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: false
-          secret-files: |
-            "netrc=/home/runner/.netrc"
+      # - name: Push docker images
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     platforms: linux/arm64,linux/amd64
+      #     file: ${{ matrix.images.dockerfile }}
+      #     push: true
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      #     provenance: false
+      #     secret-files: |
+      #       "netrc=/home/runner/.netrc"
 
   release:
     name: Finalize release
@@ -162,7 +162,7 @@ jobs:
           allowUpdates: true
           tag: ${{ needs.draft-release.outputs.version }}
           name: ${{ needs.draft-release.outputs.version }}
-          token: ${{ env.GITHUB_TOKEN }}
+          # token: ${{ env.GITHUB_TOKEN }}
 
   # deploy:
   #   name: Deploy to UAT

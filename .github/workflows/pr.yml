@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         images:
-          - registry: ghcr.io/ketch-com/ketch-event-forwarder
-            localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
+          - localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
+            # registry: ghcr.io/ketch-com/ketch-event-forwarder
             dockerfile: docker/ketch-event-forwarder/Dockerfile
       fail-fast: false
     env:
@@ -52,7 +52,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ${{ matrix.images.dockerfile }}
           tags: ${{ matrix.images.localRegistry }}:latest
-          # push: true
+          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secret-files: |
