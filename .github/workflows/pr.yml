@@ -12,11 +12,11 @@ jobs:
       matrix:
         images:
           - localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
-            # registry: ghcr.io/ketch-com/ketch-event-forwarder
+            registry: ghcr.io/ketch-com/ketch-event-forwarder
             dockerfile: docker/ketch-event-forwarder/Dockerfile
       fail-fast: false
     env:
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
     services:
