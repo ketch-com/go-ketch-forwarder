@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         images:
-          - localRegistry: localhost:5000/ketch-com/ketch-event-forwarder
-            registry: ghcr.io/ketch-com/ketch-event-forwarder
+          - localRegistry: localhost:5000/ketch-com/go-ketch-forwarder
+            registry: ghcr.io/ketch-com/go-ketch-forwarder
             dockerfile: docker/ketch-event-forwarder/Dockerfile
       fail-fast: false
     env:
