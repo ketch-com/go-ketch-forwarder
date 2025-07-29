@@ -7,7 +7,7 @@ This is the ketch-forwarder main entrypoint.
 To run this command, use the following from the repository root:
 
 ```shell
-go run cmd/ketch-forwarder/main.go
+go run cmd/ketch-event-forwarder/main.go
 ```
 
 ## Building
@@ -15,5 +15,5 @@ go run cmd/ketch-forwarder/main.go
 To build this command, use the following from the repository root:
 
 ```shell
-go build -o .build/ketch-forwarder cmd/ketch-forwarder/main.go
+go build -o .build/ketch-event-forwarder ./cmd/ketch-event-forwarder/main.go
 ```
