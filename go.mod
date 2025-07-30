@@ -7,7 +7,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/pkg/errors v0.9.1
-	go.uber.org/fx v1.22.2
+	go.uber.org/fx v1.23.0
 )
 
 require (
