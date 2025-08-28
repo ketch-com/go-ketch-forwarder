@@ -1,18 +1,55 @@
 package server
 
 import (
-	"github.com/golang/gddo/httputil/header"
 	"net/http"
+	"strings"
 )
 
 func CanAccept(r *http.Request, values ...string) bool {
-	for _, spec := range header.ParseAccept(r.Header, "Accept") {
-		for _, value := range values {
-			if spec.Value == value || spec.Value == "*/*" {
+	accepts := parseAcceptValues(r.Header)
+
+	if len(accepts) == 0 {
+		return false
+	}
+
+	lowered := make([]string, 0, len(values))
+	for _, v := range values {
+		lowered = append(lowered, strings.ToLower(v))
+	}
+
+	for _, spec := range accepts {
+		if spec == "*/*" {
+			return true
+		}
+		for _, want := range lowered {
+			if spec == want {
 				return true
 			}
 		}
 	}
 
 	return false
+}
+
+// parseAcceptValues parses the Accept header values into a list of media types
+// without parameters (e.g., "application/json"). It performs a minimal parse
+// sufficient for equality checks and the */* wildcard and is case-insensitive.
+func parseAcceptValues(h http.Header) []string {
+	var out []string
+	for _, headerVal := range h.Values("Accept") {
+		for _, part := range strings.Split(headerVal, ",") {
+			token := strings.TrimSpace(part)
+			if token == "" {
+				continue
+			}
+			if i := strings.IndexByte(token, ';'); i >= 0 {
+				token = token[:i]
+			}
+			token = strings.ToLower(strings.TrimSpace(token))
+			if token != "" {
+				out = append(out, token)
+			}
+		}
+	}
+	return out
 }
