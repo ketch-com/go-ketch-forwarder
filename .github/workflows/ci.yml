@@ -118,14 +118,14 @@ jobs:
           secret-files: |
             "netrc=/home/runner/.netrc"
       # - name: Run Snyk for linux/amd64
-      #   uses: snyk/actions/docker@master
+      #   uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04 # master
       #   env:
       #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
       #   with:
       #     image: ${{ matrix.images.localRegistry }}:latest
       #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/amd64
       # - name: Run Snyk for linux/arm64
-      #   uses: snyk/actions/docker@master
+      #   uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04 # master
       #   env:
       #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
       #   with:
@@ -171,7 +171,7 @@ jobs:
   #   needs:
   #     - draft-release
   #     - release
-  #   uses: ketch-com/crew/.github/workflows/uat.yml@main
+  #   uses: ketch-com/crew/.github/workflows/uat.yml@d1986d1db9398c6754c51772d98e9a50b3ca7467 # main
   #   with:
   #     version: ${{ needs.draft-release.outputs.version-patch }}
   #     service: ketch-event-forwarder
