@@ -171,7 +171,7 @@ jobs:
   #   needs:
   #     - draft-release
   #     - release
-  #   uses: ketch-com/crew/.github/workflows/uat.yml@d1986d1db9398c6754c51772d98e9a50b3ca7467 # main
+  #   uses: ketch-com/crew/.github/workflows/uat.yml@main
   #   with:
   #     version: ${{ needs.draft-release.outputs.version-patch }}
   #     service: ketch-event-forwarder
