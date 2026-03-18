@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - name: Generate next version
         id: semver
-        uses: conventional-actions/next-version@c6672ae04a946e12f361b119d3fd8fbb3388c0d9 # v1
+        uses: conventional-actions/next-version@1b3e4803a0bdf7435ba7bb5ace077445ed54e82a # v1.1.8
       - name: Create Draft Release
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
         with:
