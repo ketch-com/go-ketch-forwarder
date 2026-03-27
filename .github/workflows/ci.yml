@@ -123,14 +123,14 @@ jobs:
       #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
       #   with:
       #     image: ${{ matrix.images.localRegistry }}:latest
-      #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/amd64
+      #     args: --org=ketch-com --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/amd64
       # - name: Run Snyk for linux/arm64
       #   uses: snyk/actions/docker@master
       #   env:
       #     SNYK_TOKEN: ${{ secrets.SNYK_AUTH_TOKEN }}
       #   with:
       #     image: ${{ matrix.images.localRegistry }}:latest
-      #     args: --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/arm64
+      #     args: --org=ketch-com --file=${{ env.DOCKERFILE }} --severity-threshold=high --platform=linux/arm64
       - name: Push docker images
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
