@@ -1,9 +1,9 @@
 module github.com/ketch-com/go-ketch-forwarder
 
-go 1.22
+go 1.23
 
 require (
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/pkg/errors v0.9.1
 	go.uber.org/fx v1.22.2
