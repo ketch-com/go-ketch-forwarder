@@ -19,7 +19,7 @@ jobs:
       version-patch: ${{ format('{0}.{1}.{2}', steps.semver.outputs.version-major-only, steps.semver.outputs.version-minor-only, steps.semver.outputs.version-patch-only) }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with:
           fetch-depth: 0
       - name: Generate next version
@@ -61,7 +61,7 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2
       #   with:
