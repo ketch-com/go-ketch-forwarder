@@ -4,13 +4,13 @@ go 1.22
 
 require (
 	github.com/go-chi/chi/v5 v5.2.2
-	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/go-ozzo/ozzo-validation/v4 v4.4.1
 	github.com/pkg/errors v0.9.1
 	go.uber.org/fx v1.22.2
 )
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	go.uber.org/dig v1.18.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
