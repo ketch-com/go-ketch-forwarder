@@ -3,7 +3,7 @@ module github.com/ketch-com/go-ketch-forwarder
 go 1.26.8
 
 require (
-	github.com/go-chi/chi/v5 v5.3.2
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/pkg/errors v0.9.1
 	go.uber.org/fx v1.22.2
@@ -14,7 +14,7 @@ require (
 	go.uber.org/dig v1.18.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
-	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664 // indirect
+	golang.org/x/sys v0.44.0 // indirect
 )
 
 replace gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
